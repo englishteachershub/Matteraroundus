@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NMMS Quiz – நம்மைச் சுற்றியுள்ள பருப்பொருள்கள்</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#13264b;--blue:#2563eb;--green:#15803d;--red:#dc2626;--bg:#f2f5fa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#172033;font-family:'Noto Sans Tamil',Arial,sans-serif}
+header{background:linear-gradient(120deg,#13264b,#2459a6);color:#fff;text-align:center;padding:24px 14px}
+header h1{font-size:clamp(21px,4vw,30px);margin:6px 0;line-height:1.5}header p{margin:5px 0}
+.wrap{max-width:980px;margin:18px auto;padding:0 12px}
+.panel{background:white;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 5px 22px #1e3a8a12}
+.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+label{font-size:14px;font-weight:700;display:block;margin-bottom:6px}
+input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px}
+.stat{background:#eff6ff;border-radius:12px;text-align:center;padding:9px;font-size:13px}
+.stat b{display:block;color:#1d4ed8;font-size:22px;margin-top:3px}
+.progress{height:10px;background:#e5e7eb;border-radius:20px;overflow:hidden;margin-top:12px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#0ea5e9);transition:width .2s}
+.qcard{background:white;border-radius:14px;padding:17px;margin:13px 0;box-shadow:0 4px 15px #0f172a0b;border-left:5px solid #93c5fd}
+.qhead{display:flex;gap:10px;align-items:flex-start}
+.qno{background:#dbeafe;color:#1d4ed8;border-radius:8px;padding:5px 9px;font-weight:800;white-space:nowrap}
+.question{font-weight:700;line-height:1.9;flex:1}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}
+.opt{background:#fff;border:1.5px solid #d8e0ec;border-radius:10px;padding:11px;text-align:left;font:inherit;line-height:1.75;cursor:pointer;color:#172033}
+.opt:hover{border-color:#60a5fa;background:#f8fbff}
+.opt:disabled{opacity:1;cursor:default}
+.opt.correct{background:#dcfce7;border-color:#16a34a;color:#14532d;font-weight:700}
+.opt.wrong{background:#fee2e2;border-color:#dc2626;color:#7f1d1d;font-weight:700}
+.feedback{min-height:28px;margin-top:9px;font-weight:700;line-height:1.7}
+.good{color:#15803d}.bad{color:#dc2626}
+.small{font-size:13px;color:#64748b;line-height:1.7}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.action{border:0;border-radius:10px;padding:12px 17px;font:700 15px 'Noto Sans Tamil',sans-serif;cursor:pointer}
+.primary{background:#1d4ed8;color:white}.secondary{background:#e2e8f0;color:#172033}
+#summary{display:none;text-align:center}#summary .badge{font-size:44px}
+footer{text-align:center;color:#64748b;font-size:12px;padding:18px}
+#confettiCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:10000}
+@media(max-width:620px){.options{grid-template-columns:1fr}.qcard{padding:13px}.stats{gap:5px}.stat b{font-size:19px}}
+</style>
+</head>
+<body>
+<header>
+ <p>NMMS STUDY PLAN • VII STANDARD • SCIENCE</p>
+ <h1>7.1.3. நம்மைச் சுற்றியுள்ள பருப்பொருள்கள்</h1>
+ <p>50 பயிற்சி வினாக்கள் | உடனடி மதிப்பீடு</p>
+ <p><b>GHSS ERASAKKANAYAKANUR</b></p>
+</header>
+<main class="wrap">
+ <section class="panel">
+  <div class="formgrid">
+   <div><label for="student">மாணவர் பெயர்</label><input id="student" placeholder="மாணவர் பெயரை உள்ளிடவும்"></div>
+   <div><label for="className">வகுப்பு / பிரிவு</label><input id="className" value="VII"></div>
+   <div><label for="school">பள்ளியின் பெயர்</label><input id="school" value="GHSS ERASAKKANAYAKANUR"></div>
+  </div>
+  <div class="stats">
+   <div class="stat">மதிப்பெண்<b id="score">0 / 50</b></div>
+   <div class="stat">பதிலளித்தவை<b id="answered">0 / 50</b></div>
+   <div class="stat">மீதமுள்ளவை<b id="remaining">50</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <p class="small">விடையைத் தேர்ந்தெடுத்தவுடன் உடனடியாகச் சரி / தவறு காட்டப்படும். ஒவ்வொரு சரியான விடைக்கும் கொண்டாட்டம்! தேர்வு செய்த விடையை மாற்ற இயலாது.</p>
+ </section>
+ <div id="quiz"></div>
+ <section class="panel" id="summary">
+  <div class="badge" id="badge">🏆</div><h2 id="message"></h2>
+  <p id="finalscore"></p><p id="encourage"></p>
+ </section>
+ <section class="panel">
+  <div class="actions">
+   <button class="action primary" onclick="downloadPDF()">⬇ PDF செயல்திறன் அறிக்கை</button>
+   <button class="action secondary" onclick="window.print()">🖨 அச்சிடுக</button>
+   <button class="action secondary" onclick="location.reload()">மீண்டும் தொடங்கு</button>
+  </div>
+  <p class="small" style="text-align:center;margin-top:12px">PDF அறிக்கையில் மாணவர் விவரம், மதிப்பெண், 50 வினாக்கள், அனைத்து தெரிவுகள், மாணவர் தேர்வு மற்றும் சரியான விடை ஆகியவை இடம்பெறும். PDF உருவாக்கம் browser Print வசதியைப் பயன்படுத்துவதால் வெற்றுப் பக்க அறிக்கை உருவாகாது.</p>
+ </section>
+</main>
+<footer>Quiz prepared by T.S. RAMACHANDRAN • GHSS ERASAKKANAYAKANUR</footer>
+<canvas id="confettiCanvas"></canvas>
+<script>
+const questions = [{"q": "பருப்பொருள்களின் அடிப்படை அலகு எது?", "o": ["செல்", "தனிமம்", "அணு", "சேர்மம்"], "a": 3}, {"q": "பேரண்டத்தில் அதிக அளவில் காணப்படும் தனிமம் எது?", "o": ["ஆக்சிஜன்", "சிலிக்கான்", "ஹீலியம்", "ஹைட்ரஜன்"], "a": 4}, {"q": "புவியில் அதிகம் காணப்படும் தனிமங்கள் எவை?", "o": ["இரும்பு மற்றும் ஹைட்ரஜன்", "ஆக்சிஜன் மற்றும் ஹைட்ரஜன்", "இரும்பு, ஆக்சிஜன் மற்றும் சிலிக்கான்", "நைட்ரஜன், ஆக்சிஜன் மற்றும் ஹைட்ரஜன்"], "a": 3}, {"q": "ஒரு அணுவானது மற்றொரு அணு அல்லது அணுக்களுடன் இணைந்து உருவாக்குவது எது?", "o": ["சேர்மம்", "மூலக்கூறு", "தனிமம்", "உலோகப்போலிகள்"], "a": 2}, {"q": "ஓசோன் மூலக்கூறில் உள்ள ஆக்சிஜன் அணுக்களின் எண்ணிக்கை எத்தனை?", "o": ["1", "2", "3", "1, 2"], "a": 3}, {"q": "நீரின் மூலக்கூறு வாய்பாடு எது?", "o": ["H₂O", "HO₂", "H₂O₂", "HO"], "a": 1}, {"q": "பொருத்துக: 1. ஓரணு மூலக்கூறு  2. ஈரணு மூலக்கூறு  3. மூவணு மூலக்கூறு  4. பல அணு மூலக்கூறு. i. சல்பர்  ii. மந்தவாயுக்கள்  iii. ஆக்சிஜன்  iv. ஓசோன்", "o": ["ii, iii, iv, i", "iii, ii, iv, i", "i, ii, iv, iii", "iv, ii, i, iii"], "a": 1}, {"q": "பொருந்தாத இணையைக் தேர்வு செய்க.", "o": ["ஓரணு மூலக்கூறு – ஹீலியம்", "ஈரணு மூலக்கூறு – ஹைட்ரஜன்", "மூவணு மூலக்கூறு – கார்பன் டை ஆக்சைடு", "பல அணு மூலக்கூறு – நைட்ரிக் ஆக்சைடு"], "a": 4}, {"q": "பொருத்துக: a) அணு  b) தனிமம்  c) சேர்மம்  d) வேதிக் குறியீடு. i) வேதித் தனிமத்தின் அமைப்பைக் குறிக்கும் எளிய குறியீடு  ii) பல்வேறு வகை அணுக்களால் ஆனது  iii) ஒரே வகை அணுக்களால் ஆனது  iv) பருப்பொருள்களின் மிகச்சிறிய அலகு", "o": ["a–iv, b–i, c–ii, d–iii", "a–iii, b–i, c–iv, d–ii", "a–iv, b–iii, c–ii, d–i", "a–i, b–iii, c–ii, d–iv"], "a": 3}, {"q": "இதுவரை கண்டறியப்பட்ட தனிமங்களின் எண்ணிக்கை எத்தனை?", "o": ["181", "118", "94", "24"], "a": 2}, {"q": "இயற்கையில் கிடைக்கும் தனிமங்களின் எண்ணிக்கை எத்தனை?", "o": ["84", "49", "94", "24"], "a": 3}, {"q": "ஆய்வகங்களில் செயற்கையாகத் தயாரிக்கப்பட்ட தனிமங்களின் எண்ணிக்கை எத்தனை?", "o": ["42", "118", "94", "24"], "a": 4}, {"q": "பொருத்துக: a) பிஸ்மத்  b) பாஸ்பரஸ்  c) காலியம்  d) சிலிக்கான். i) வெடிபொருள்  ii) வயிற்றுப்போக்குச் சிகிச்சை  iii) கணினி சிப்  iv) அலைபேசி", "o": ["a–ii, b–i, c–iii, d–iv", "a–iii, b–i, c–ii, d–iv", "a–iii, b–iv, c–ii, d–i", "a–ii, b–i, c–iv, d–iii"], "a": 4}, {"q": "அறை வெப்பநிலையில் திரவமாகக் காணப்படும் உலோகம் எது?", "o": ["பாதரசம்", "புரோமின்", "சோடியம்", "மக்னீசியம்"], "a": 1}, {"q": "மென்மையான உலோகம் எது?", "o": ["வெள்ளி", "அலுமினியம்", "சோடியம்", "இரும்பு"], "a": 3}, {"q": "கரிக்கோலில் (பென்சில்) இருப்பது எது?", "o": ["வைரம்", "கந்தகம்", "கிராஃபைட்", "அலுமினியம்"], "a": 3}, {"q": "கடினமான மற்றும் பளபளப்பான அலோகம் எது?", "o": ["பாதரசம்", "புரோமின்", "கிராஃபைட்", "வைரம்"], "a": 4}, {"q": "அறை வெப்பநிலையில் திரவமாகக் காணப்படும் ஒரே அலோகம் எது?", "o": ["பாதரசம்", "புரோமின்", "சல்பர்", "நீர்"], "a": 2}, {"q": "உலோகப் பண்புகளையும் அலோகப் பண்புகளையும் பெற்றுள்ள தனிமங்கள் எவ்வாறு அழைக்கப்படுகின்றன?", "o": ["உலோகக் கலவை", "உலோகப் போலிகள்", "சேர்மங்கள்", "மூலக்கூறுகள்"], "a": 2}, {"q": "பொருந்தாததைத் தேர்ந்தெடு.", "o": ["டின்", "துத்தநாகம்", "காரீயம்", "ஆண்டிமணி"], "a": 4}, {"q": "பொருந்தாததைத் தேர்ந்தெடு.", "o": ["குளோரின்", "ஆக்சிஜன்", "ஹைட்ரஜன்", "புரோமின்"], "a": 4}, {"q": "பொருந்தாததைத் தேர்ந்தெடு.", "o": ["அயோடின்", "பாஸ்பரஸ்", "ஹைட்ரஜன்", "சல்பர்"], "a": 3}, {"q": "ஒரு ஹைட்ரஜன் குளோரைடு மூலக்கூறில் உள்ள ஹைட்ரஜன் மற்றும் குளோரின் அணுக்களின் எண்ணிக்கை முறையே எத்தனை?", "o": ["1, 2", "2, 1", "1, 1", "2, 2"], "a": 3}, {"q": "நீர் மூலக்கூறில் உள்ள ஹைட்ரஜன் மற்றும் ஆக்சிஜன் அணுக்களின் எண்ணிக்கை முறையே எத்தனை?", "o": ["1, 2", "2, 1", "1, 1", "2, 2"], "a": 2}, {"q": "பின்வருவனவற்றுள் ஈரணு மூலக்கூறு அல்லாதது எது?", "o": ["ஓசோன்", "ஆக்சிஜன்", "நைட்ரஜன்", "குளோரின்"], "a": 1}, {"q": "கீழ்க்காண்பவற்றுள் எது உலோகப்போலி அல்ல?", "o": ["போரான்", "ஹைட்ரஜன்", "சிலிக்கான்", "ஜெர்மேனியம்"], "a": 2}, {"q": "‘தனிமம்’ என்ற சொல்லை முதன்முதலில் பயன்படுத்தியவர் யார்?", "o": ["இராபர்ட் ஹூக்", "இராபர்ட் பாயில்", "ஜான் டால்டன்", "ரூதர்ஃபோர்டு"], "a": 2}, {"q": "வெள்ளைச் சர்க்கரையில் உள்ள தனிமங்கள் எவை?", "o": ["சோடியம் மற்றும் குளோரின்", "கார்பன், ஹைட்ரஜன் மற்றும் கால்சியம்", "கார்பன், ஹைட்ரஜன் மற்றும் ஆக்சிஜன்", "சோடியம், ஹைட்ரஜன் மற்றும் குளோரின்"], "a": 3}, {"q": "IUPAC என்பதன் விரிவாக்கம் எது?", "o": ["Indian Union of Pure and Applied Chemistry", "Indian Unity of Pure and Applied Chemistry", "International Union of Pure and Applied Chemistry", "International Unity of Pure and Applied Chemistry"], "a": 3}, {"q": "தனிமங்களின் குறியீடுகளைத் தகுந்த முறையில் முதன்முதலில் பயன்படுத்தியவர் யார்?", "o": ["பெர்சீலியஸ்", "இராபர்ட் பாயில்", "டால்டன்", "இரசவாதிகள்"], "a": 3}, {"q": "‘தாமிரம்’ என்ற சொல் எச்சொல்லிலிருந்து உருவாக்கப்பட்டது?", "o": ["சிட்ரஸ்", "சிப்ரஸ்", "மஞ்சள்", "ஊதா"], "a": 2}, {"q": "பொருத்துக: a) மீத்தேன்  b) எத்தனால்  c) சுக்ரோஸ்  d) கந்தக அமிலம். i) C₂H₅OH  ii) CH₄  iii) H₂SO₄  iv) C₁₂H₂₂O₁₁", "o": ["a–i, b–iii, c–iv, d–ii", "a–ii, b–i, c–iv, d–iii", "a–ii, b–iv, c–iii, d–i", "a–iv, b–iii, c–ii, d–i"], "a": 2}, {"q": "பொருத்துக: a) போரான்  b) ஆர்சனிக்  c) சிலிக்கான்  d) ஆண்டிமனி. i) Sb  ii) Si  iii) As  iv) B", "o": ["a–iv, b–i, c–ii, d–iii", "a–iii, b–i, c–ii, d–iv", "a–iii, b–iv, c–ii, d–i", "a–iv, b–iii, c–ii, d–i"], "a": 4}, {"q": "சேர்மத்தின் அடிப்படைத் துகள் எது?", "o": ["தனிமங்கள்", "அணுக்கள்", "மூலக்கூறுகள்", "பருப்பொருள்கள்"], "a": 3}, {"q": "சேர்மத்தினைக் குறித்த கருத்துக்களில் தவறானதைத் தேர்ந்தெடு.", "o": ["சேர்மங்களை இயற்பியல் முறையில் அவற்றின் கூறுகளாகப் பிரிக்க இயலும்", "சேர்மங்களை வேதியியல் முறையில் அவற்றின் கூறுகளாகப் பிரிக்க இயலும்", "தனிமங்கள் ஒரு குறிப்பிட்ட விகிதத்தில் இணைவதாலேயே சேர்மங்கள் உருவாகின்றன", "சேர்மங்கள் வேதிப்பிணைப்பினால் இணைக்கப்பட்டுள்ளன"], "a": 1}, {"q": "‘தங்கம்’ என்ற சொல் எப்பொருள் தரும் வார்த்தையிலிருந்து உருவாக்கப்பட்டது?", "o": ["ஆபரணம்", "அணிகலன்", "மஞ்சள்", "ஊதா"], "a": 3}, {"q": "கூற்று: சோடியம் குளோரைடின் வேதியியல் வாய்ப்பாடு NaCl. காரணம்: வேதியியல் வாய்ப்பாடு ஒரு மூலக்கூறில் உள்ள அணுக்களின் எண்ணிக்கையையும் அணுக்களின் வகைகளையும் குறிக்கிறது.", "o": ["கூற்று சரி; காரணம் தவறு", "கூற்று தவறு; காரணம் சரி", "கூற்று மற்றும் காரணம் தவறு", "கூற்று மற்றும் காரணம் சரி"], "a": 4}, {"q": "அணுக்கட்டு எண் 1 பெற்றுள்ள தனிமம் எது?", "o": ["H", "He", "P", "S"], "a": 1}, {"q": "அணுக்கட்டு எண் 8 பெற்றுள்ள தனிமம் எது?", "o": ["H", "He", "P", "S"], "a": 4}, {"q": "அணுக்கட்டு எண் 4 பெற்றுள்ள தனிமம் எது?", "o": ["ஹைட்ரஜன்", "நைட்ரஜன்", "பாஸ்பரஸ்", "சல்பர்"], "a": 3}, {"q": "பொருத்துக: a) சோடியம் குளோரைடு  b) குளுக்கோஸ்  c) கார்பன் டை ஆக்சைடு  d) அம்மோனியா. i) C₆H₁₂O₆  ii) CO₂  iii) NaCl  iv) NH₃", "o": ["a–iii, b–ii, c–iv, d–i", "a–iii, b–i, c–ii, d–iv", "a–iii, b–iv, c–ii, d–i", "a–iv, b–iii, c–ii, d–i"], "a": 2}, {"q": "ஒரு தனிமம் அல்லது சேர்மத்தில் உள்ள அல்லது பொருளிலுள்ள ஒட்டுமொத்த எண்ணிக்கையைக் குறிப்பது எது?", "o": ["அணு எண்", "நிறை எண்", "அணுக்கட்டு எண்", "மூலக்கூறு"], "a": 3}, {"q": "கந்தக அமிலத்தின் அணுக்கட்டு எண் எத்தனை?", "o": ["7", "6", "4", "3"], "a": 1}, {"q": "நீரின் அணுக்கட்டு எண் எத்தனை?", "o": ["2", "3", "4", "1"], "a": 2}, {"q": "மனித உடலில் அதிகளவில் உள்ள தனிமங்கள் எவை?", "o": ["பொட்டாசியம், சல்பர், சோடியம், குளோரின், மக்னீசியம், பாஸ்பரஸ்", "ஆக்சிஜன், கார்பன், ஹைட்ரஜன், நைட்ரஜன், கால்சியம், பாஸ்பரஸ்", "ஆக்சிஜன், கார்பன், ஹைட்ரஜன், சோடியம், கால்சியம், பாஸ்பரஸ்", "ஆக்சிஜன், கார்பன், பொட்டாசியம், சோடியம், கால்சியம், பாஸ்பரஸ்"], "a": 2}, {"q": "காற்றில் அதிகளவில் உள்ள தனிமங்கள் எவை?", "o": ["நைட்ரஜன் மற்றும் ஆக்சிஜன்", "நியான், ஹீலியம் மற்றும் மீத்தேன்", "ஆர்கான் மற்றும் கரியமில வாயு", "ஆக்சிஜன் மற்றும் கரியமில வாயு"], "a": 1}, {"q": "மின்சாரத்தைக் கடத்தும் ஒரே அலோகம் எது?", "o": ["ஹைட்ரஜன்", "கிராஃபைட்", "புரோமின்", "வைரம்"], "a": 2}, {"q": "கூற்று: தங்கம், வெள்ளி போன்றவற்றை தகடாகவும் கம்பியாகவும் மாற்ற இயலும். காரணம்: தங்கம், வெள்ளி போன்றவை உலோகங்கள் என அழைக்கப்படுகின்றன.", "o": ["கூற்று சரி; காரணம் தவறு", "கூற்று தவறு; காரணம் சரி", "கூற்று மற்றும் காரணம் தவறு", "கூற்று மற்றும் காரணம் சரி"], "a": 4}, {"q": "கூற்று (1): பொதுவாக ஒரு பொருள் வெப்பப்படுத்தும்போது விரிவடைகிறது. கூற்று (2): ஒரு பொருள் வெப்பப்படுத்தும்போது நிலையில் மாற்றம் ஏற்படுகிறது. கூற்று (3): ஒரு பொருள் வெப்பப்படுத்தும்போது பரிமாணத்தில் எந்த மாற்றமும் ஏற்படுவதில்லை. சரியான கூற்றுகள் எவை?", "o": ["கூற்று 1, 2 மற்றும் 3 சரியானவை", "கூற்று 1, 2 மட்டும் சரியானவை", "கூற்று 1, 3 மட்டும் சரியானவை", "கூற்று 1 மட்டும் சரியானது"], "a": 4}, {"q": "கூற்று: வெப்பக் காற்று நிரப்பப்பட்ட பலூன் காற்றில் மிதக்கிறது. காரணம் (1): பலூனில் உள்ள காற்றின் அடர்த்தியைவிட வெளிப்புறக் காற்றின் அடர்த்தி அதிகம். காரணம் (2): பலூனில் உள்ள காற்றின் அடர்த்தியைவிட வெளிப்புறக் காற்றின் அடர்த்தி குறைவு. சரியான விடை எது?", "o": ["கூற்று சரி; காரணம் 2 கூற்றைச் சரியாக விளக்குகிறது", "கூற்று சரி; காரணம் 1 மற்றும் 2 சரியான விளக்கமில்லை", "கூற்று சரி; காரணம் 1 கூற்றைச் சரியாக விளக்குகிறது", "கூற்று மற்றும் காரணம் ஆகிய இரண்டும் தவறு"], "a": 3}];
+let selected=Array(questions.length).fill(null), score=0;
+const quiz=document.getElementById('quiz');
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function render(){
+ questions.forEach((q,i)=>{
+  const card=document.createElement('section');card.className='qcard';card.id='q'+i;
+  const head=document.createElement('div');head.className='qhead';
+  const no=document.createElement('span');no.className='qno';no.textContent='வினா '+(i+1);
+  const stem=document.createElement('div');stem.className='question';stem.textContent=q.q;
+  head.append(no,stem);card.append(head);
+  const opts=document.createElement('div');opts.className='options';
+  q.o.forEach((op,j)=>{
+   const b=document.createElement('button');b.className='opt';b.type='button';
+   b.innerHTML='<b>('+ (j+1)+')</b> '+esc(op);
+   b.addEventListener('click',()=>choose(i,j,card));opts.append(b);
+  });
+  card.append(opts);
+  const fb=document.createElement('div');fb.className='feedback';fb.id='fb'+i;card.append(fb);
+  quiz.append(card);
+ });
+}
+function choose(i,j,card){
+ if(selected[i]!==null)return;
+ selected[i]=j;const key=questions[i].a-1;
+ const buttons=card.querySelectorAll('.opt');
+ buttons.forEach((b,k)=>{b.disabled=true;if(k===key)b.classList.add('correct');if(k===j&&j!==key)b.classList.add('wrong');});
+ const fb=document.getElementById('fb'+i);
+ if(j===key){score++;fb.className='feedback good';fb.textContent='✓ சரியான விடை! மிகச் சிறப்பு!';burstConfetti();}
+ else{fb.className='feedback bad';fb.textContent='✕ தவறான விடை. சரியான விடை: ('+(key+1)+') '+questions[i].o[key];}
+ update();
+ if(selected.every(x=>x!==null))finish();
+}
+function update(){
+ const n=selected.filter(x=>x!==null).length;
+ document.getElementById('score').textContent=score+' / 50';
+ document.getElementById('answered').textContent=n+' / 50';
+ document.getElementById('remaining').textContent=50-n;
+ document.getElementById('bar').style.width=(n/50*100)+'%';
+}
+function finish(){
+ const sum=document.getElementById('summary');sum.style.display='block';
+ let badge,msg,enc;
+ if(score>=45){badge='🏆';msg='அற்புதம்! NMMS சாம்பியன்!';enc='உங்கள் தயாரிப்பு மிகச் சிறப்பாக உள்ளது. தொடர்ந்து பயிற்சி செய்யுங்கள்!';}
+ else if(score>=35){badge='🌟';msg='மிகச் சிறந்த முயற்சி!';enc='இன்னும் சில திருத்தங்கள் செய்தால் சிறந்த மதிப்பெண் பெறலாம்.';}
+ else if(score>=25){badge='👏';msg='நல்ல முயற்சி!';enc='தவறான விடைகளை மீண்டும் படித்து பயிற்சி செய்யுங்கள்.';}
+ else{badge='💪';msg='முயற்சியைத் தொடருங்கள்!';enc='ஒவ்வொரு தவறும் கற்றலுக்கான வாய்ப்பு. மீண்டும் முயற்சி செய்யுங்கள்!';}
+ document.getElementById('badge').textContent=badge;
+ document.getElementById('message').textContent=msg;
+ document.getElementById('finalscore').textContent='மதிப்பெண்: '+score+' / 50 ('+Math.round(score/50*100)+'%)';
+ document.getElementById('encourage').textContent=enc;
+ sum.scrollIntoView({behavior:'smooth'});
+}
+let particles=[],ctx,canvas;
+function burstConfetti(){
+ canvas=document.getElementById('confettiCanvas');ctx=canvas.getContext('2d');
+ const dpr=Math.min(window.devicePixelRatio||1,2);
+ canvas.width=innerWidth*dpr;canvas.height=innerHeight*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+ const x=innerWidth/2,y=Math.max(120,innerHeight*.22);
+ const colors=['#16a34a','#f59e0b','#2563eb','#ec4899','#8b5cf6'];
+ for(let i=0;i<65;i++){const a=Math.random()*Math.PI*2,v=2+Math.random()*6;particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-2,life:45+Math.random()*25,size:3+Math.random()*5,color:colors[Math.floor(Math.random()*colors.length)],rot:Math.random()*6});}
+ if(!burstConfetti.running){burstConfetti.running=true;animateConfetti();}
+}
+function animateConfetti(){
+ ctx.clearRect(0,0,innerWidth,innerHeight);
+ particles=particles.filter(p=>p.life>0);
+ particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.13;p.vx*=.99;p.life--;p.rot+=.12;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.color;ctx.globalAlpha=Math.min(1,p.life/18);ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*1.6);ctx.restore();});
+ if(particles.length)requestAnimationFrame(animateConfetti);else{ctx.clearRect(0,0,innerWidth,innerHeight);burstConfetti.running=false;}
+}
+function downloadPDF(){
+ const name=document.getElementById('student').value.trim()||'பெயர் குறிப்பிடப்படவில்லை';
+ const cls=document.getElementById('className').value.trim()||'VII';
+ const school=document.getElementById('school').value.trim()||'GHSS ERASAKKANAYAKANUR';
+ const answered=selected.filter(x=>x!==null).length;
+ let rows='';
+ questions.forEach((q,i)=>{
+  const chosen=selected[i],key=q.a-1;
+  const studentAns=chosen===null?'பதிலளிக்கவில்லை':'('+ (chosen+1)+') '+q.o[chosen];
+  const correct='('+q.a+') '+q.o[key];
+  const status=chosen===null?'பதிலளிக்கவில்லை':chosen===key?'சரி':'தவறு';
+  rows+=`<tr><td>${i+1}</td><td>${esc(q.q)}<div class="opts">${q.o.map((o,j)=>'('+ (j+1)+') '+esc(o)).join(' &nbsp; | &nbsp; ')}</div></td><td>${esc(studentAns)}</td><td>${esc(correct)}</td><td class="${status==='சரி'?'ok':status==='தவறு'?'no':''}">${status}</td></tr>`;
+ });
+ const report=`<!DOCTYPE html><html lang="ta"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet"><title>NMMS Student Report</title><style>
+ body{font-family:'Noto Sans Tamil',Arial,sans-serif;color:#111;margin:12mm;font-size:11px}h1,h2,p{text-align:center;margin:5px 0;line-height:1.6}.meta{border:1px solid #888;background:#f4f7fc;padding:10px;margin:14px 0}.score{text-align:center;font-size:18px;font-weight:bold;margin:8px}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #777;padding:6px;vertical-align:top;overflow-wrap:anywhere}th{background:#e6edf8}th:nth-child(1){width:6%}th:nth-child(2){width:53%}th:nth-child(3){width:15%}th:nth-child(4){width:16%}th:nth-child(5){width:10%}.opts{font-size:9px;line-height:1.7;color:#444;margin-top:4px}.ok{color:#08752b;font-weight:bold}.no{color:#b91c1c;font-weight:bold}tr{break-inside:avoid;page-break-inside:avoid}thead{display:table-header-group}@page{size:A4 landscape;margin:9mm}@media print{body{margin:0}}
+ </style></head><body><h1>${esc(school)}</h1><h2>NMMS – VII STANDARD – SCIENCE</h2><h2>7.1.3. நம்மைச் சுற்றியுள்ள பருப்பொருள்கள்</h2><p>மாணவர் செயல்திறன் அறிக்கை</p><div class="meta"><p><b>மாணவர் பெயர்:</b> ${esc(name)} &nbsp;&nbsp; <b>வகுப்பு:</b> ${esc(cls)}</p><p><b>பதிலளித்தவை:</b> ${answered}/50 &nbsp;&nbsp; <b>சரியானவை:</b> ${score} &nbsp;&nbsp; <b>தவறானவை:</b> ${answered-score} &nbsp;&nbsp; <b>பதிலளிக்காதவை:</b> ${50-answered}</p><div class="score">மதிப்பெண்: ${score}/50 (${Math.round(score/50*100)}%)</div></div><table><thead><tr><th>வினா எண்</th><th>வினா மற்றும் தெரிவுகள்</th><th>மாணவர் தேர்வு</th><th>சரியான விடை</th><th>முடிவு</th></tr></thead><tbody>${rows}</tbody></table><p style="margin-top:16px">Prepared by T.S. RAMACHANDRAN • GHSS ERASAKKANAYAKANUR</p><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),900));<\/script></body></html>`;
+ // Open synchronously from the button click so popup blockers are less likely to interfere.
+ const w=window.open('','_blank');
+ if(!w){alert('PDF அறிக்கையைத் திறக்க Popup அனுமதி தேவை. Chrome-ல் இந்தப் பக்கத்திற்கான Pop-ups அனுமதித்து மீண்டும் முயற்சிக்கவும்.');return;}
+ w.document.open();w.document.write(report);w.document.close();
+}
+render();update();
+</script>
+</body></html>
